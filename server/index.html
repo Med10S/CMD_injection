@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface Admin - Gestion des Fichiers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Barre de navigation */
+        .navbar {
+            background-color: #343a40;
+            padding: 15px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .navbar a {
+            color: #ddd;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        .navbar a:hover {
+            color: #fff;
+        }
+
+        .container {
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 60%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        pre {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-top: 20px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .admin-info {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Barre de navigation -->
+    <div class="navbar">
+        <h2>Admin - Gestion des Fichiers</h2>
+        <div>
+            <a href="#">Dashboard</a>
+            <a href="#">Utilisateurs</a>
+            <a href="#">Paramètres</a>
+            <a href="#">Déconnexion</a>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="container">
+        <h1>Gestion des Fichiers</h1>
+        <p class="admin-info">Bienvenue, administrateur. Vous pouvez exécuter des commandes de gestion de fichiers
+            ci-dessous.</p>
+        <input type="text" id="commandInput" placeholder="Entrer une commande (cat/ls)">
+        <button id="executeButton">Exécuter</button>
+        <pre id="result"></pre>
+    </div>
+
+    <script>
+        document.getElementById('executeButton').addEventListener('click', async () => {
+            const command = document.getElementById('commandInput').value;
+            const response = await fetch('/execute', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ command }),
+            });
+
+            const data = await response.json();
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = response.ok ? data.result : data.error;
+            resultElement.className = response.ok ? 'success' : 'error';
+        });
+    </script>
+</body>
+
+</html>
