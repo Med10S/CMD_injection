@@ -22,24 +22,21 @@ app.post('/execute', (req, res) => {
         return res.status(400).json({ error: 'Commande non autorisée.' });
     }
 
-    // Exécuter la commande
-    if (cmd === 'dir' || cmd === 'ls' || cmd === 'cat' || cmd === 'type') {
-        const dirPath = filePath ? filePath : '.';
 
 
-        exec(`${command}`, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Erreur : ${error.message}`);
-                return res.status(500).json({ error: 'Erreur lors de l\'exécution de la commande.' });
-            }
-            if (stderr) {
-                console.error(`Erreur : ${stderr}`);
-                return res.status(500).json({ error: 'Erreur lors de l\'exécution de la commande.' });
-            }
-            console.log(`Résultat de la commande ls :\n${stdout}`);
-            res.json({ result: stdout });
-        });
-    }
+    exec(`${command}`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Erreur : ${error.message}`);
+            return res.status(500).json({ error: 'Erreur lors de l\'exécution de la commande.' });
+        }
+        if (stderr) {
+            console.error(`Erreur : ${stderr}`);
+            return res.status(500).json({ error: 'Erreur lors de l\'exécution de la commande.' });
+        }
+        console.log(`Résultat de la commande ls :\n${stdout}`);
+        res.json({ result: stdout });
+    });
+
 });
 
 app.listen(PORT, () => {
