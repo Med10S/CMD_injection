@@ -1,50 +1,37 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { exec } = require('child_process'); // Importer exec depuis child_process
+const { exec } = require('child_process');
 const app = express();
 const PORT = 3000;
 
-// Middleware
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-const allowedCommands = ['dir', 'cat', "type", "ls"];
-
 app.post('/execute', (req, res) => {
-    const command = req.body.command;
+    const { command } = req.body;
 
-    // Vérification de la commande
-    const commandParts = command.split(' ');
-    const cmd = commandParts[0];
-    const filePath = commandParts[1];
+    const exec = require('child_process').exec;
 
-    if (!allowedCommands.includes(cmd)) {
-        return res.status(400).json({ error: 'Commande non autorisée.' });
-    }
-
-
-
-    exec(`${command}`, (error, stdout, stderr) => {
+    exec(command, (error, stdout, stderr) => {
         if (error) {
-            console.error(`Erreur : ${error.message}`);
-            return res.status(500).json({ error: 'Erreur lors de l\'exécution de la commande.' });
+            return res.status(500).json({ error: stderr });
         }
-        if (stderr) {
-            console.error(`Erreur : ${stderr}`);
-            return res.status(500).json({ error: 'Erreur lors de l\'exécution de la commande.' });
-        }
-        console.log(`Résultat de la commande ls :\n${stdout}`);
-        res.json({ result: stdout });
-    });
 
+        // Normaliser les retours à la ligne et gérer les caractères spéciaux
+        const result = stdout
+            .replace(/\r\n/g, '\n') // Normaliser les retours à la ligne
+            .replace(/�/g, 'é'); // Exemple de remplacement
+
+        res.set('Content-Type', 'application/json; charset=utf-8');
+        res.json({ result });
+    });
 });
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-// Route pour servir le fichier index.html
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
-

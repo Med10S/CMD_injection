@@ -122,14 +122,43 @@
         <h1>Gestion des Fichiers</h1>
         <p class="admin-info">Bienvenue, administrateur. Vous pouvez exécuter des commandes de gestion de fichiers
             ci-dessous.</p>
-        <input type="text" id="commandInput" placeholder="Entrer une commande (cat/ls)">
+        <input type="text" id="commandInput" placeholder="Vous ne pouver utliser que ls cette fois">
         <button id="executeButton">Exécuter</button>
         <pre id="result"></pre>
     </div>
 
     <script>
         document.getElementById('executeButton').addEventListener('click', async () => {
-            const command = document.getElementById('commandInput').value;
+            const command = document.getElementById('commandInput').value.trim();
+
+            // Validation stricte de la commande côté client
+            const allowedCommands = ['ls', 'dir'];
+            const commandParts = command.split(' ');
+            const cmd = commandParts[0];
+
+            // Vérifier si la commande fait partie des commandes autorisées
+            if (!allowedCommands.includes(cmd)) {
+                document.getElementById('result').textContent = "Commande non autorisée côté client.";
+                document.getElementById('result').className = 'error';
+                return;
+            }
+
+            // Vérification de caractères non autorisés
+            const forbiddenCharacters = /[;&|<>]/;
+            if (forbiddenCharacters.test(command)) {
+                document.getElementById('result').textContent = "Caractères non autorisés détectés.";
+                document.getElementById('result').className = 'error';
+                return;
+            }
+
+            // Limite le nombre de paramètres pour éviter les commandes trop complexes
+            if (commandParts.length > 2) {
+                document.getElementById('result').textContent = "Commande trop complexe.";
+                document.getElementById('result').className = 'error';
+                return;
+            }
+
+            // Envoi de la commande au serveur si tout est valide côté client
             const response = await fetch('/execute', {
                 method: 'POST',
                 headers: {
